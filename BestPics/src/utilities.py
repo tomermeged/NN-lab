@@ -13,7 +13,7 @@ import numpy as np
 import tensorflow as tf
 
 
-# print_and_log
+# PRINT FUNCTIONS
 def print_and_log(str, var1=None, var2=None, var3=None, var4=None, var5=None, var6=None, var7=None, var8=None, var9=None):
     """
     used to print msgs to both screen and log file
@@ -42,14 +42,14 @@ def print_timestamp(str, var1=None, var2=None, var3=None, var4=None, var5=None, 
     print(str.format(var1, var2, var3, var4, var5, var6, var7, var8, var9))
 
 
-
+# CALCULATE PARAMS
 def calc_params():
     """
     calculates the sum of all variables multiplications
     """
     return np.sum([np.prod(var.shape) for var in tf.trainable_variables()])
 
-# HELPER FUNCTIONS FOR DEALING WITH DATA.
+# ONE HOT ENCODING
 def one_hot_encode(vec, vals):
     """
     one-hot encode for labels
@@ -62,7 +62,7 @@ def one_hot_encode(vec, vals):
     out[range(n), vec] = 1
     return out
 
-# HELPER FUNCTIONS FOR DEALING WITH DATA.
+# CREATE DIR
 def create_dir(dir_name, dir_name_str=""):
     """
     make dir only if dir doesn't already exist
@@ -73,7 +73,7 @@ def create_dir(dir_name, dir_name_str=""):
 
 
 
-
+# SAVE MODEL
 def save_model(saver, sess):
     """
     save model, src and log and print a msg
@@ -90,6 +90,7 @@ def save_model(saver, sess):
     if not os.path.exists(model_src_dir):
         copytree(CM.TEMP_DIR_SRC, model_src_dir)
 
+# RESTORE MODEL
 def restore_model(saver, sess, model_name):
     """
     restore saved model and print a msg
