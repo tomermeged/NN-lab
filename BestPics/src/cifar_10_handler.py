@@ -12,7 +12,8 @@
 #################################################
 
 
-from common import *
+import common as CM
+import numpy as np
 
 from utilities import print_and_log
 from utilities import print_and_log_timestamp
@@ -29,7 +30,7 @@ def unpickle(file):
 dirs = ['batches.meta', 'data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5', 'test_batch']
 all_data = [0, 1, 2, 3, 4, 5, 6]
 for i, direc in zip(all_data, dirs):
-    all_data[i] = unpickle(CIFAR_DIR + direc)
+    all_data[i] = unpickle(CM.CIFAR_DIR + direc)
 
 batch_meta = all_data[0]
 data_batch1 = all_data[1]
@@ -70,24 +71,32 @@ class CifarC:
         # Grabs a list of all the test batches (really just one batch)
         self.test_batch = [test_batch]
 
+        self.image_width = 32
+        self.image_height = 32
+        self.color_deapth = 255
+        self.cs_rgb = 3
+
         # Initialize some empty variables for later on
         self.training_images = None
-        self.training_images = None
+        self.training_labels = None
+        self.training_len = None
 
         self.test_images = None
         self.test_labels = None
-        
-        self.train_len = None
+        self.test_len = None
 
     def set_up_images(self):
+        """
+        preparing the images for later use
+        """
         print_and_log("Setting Up Training Images and Labels")
 
         # Vertically stacks the training images
         self.training_images = np.vstack([d[b"data"] for d in self.all_train_batches])
-        self.train_len = len(self.training_images)
+        self.training_len = len(self.training_images)
 
         # Reshapes and normalizes training images (x/255 is normalizing the colorspace)
-        self.training_images = self.training_images.reshape(self.train_len, CS_RGB, CIFAR_IMAGE_WIDTH, CIFAR_IMAGE_HEIGHT).transpose(0, 2, 3, 1) / COLOR_DEAPTH
+        self.training_images = self.training_images.reshape(self.training_len, self.cs_rgb, self.image_width, self.image_height).transpose(0, 2, 3, 1) / self.color_deapth
         # One hot Encodes the training labels (e.g. [0,0,0,1,0,0,0,0,0,0])
         self.training_labels = one_hot_encode(np.hstack([d[b"labels"] for d in self.all_train_batches]), num_labels)
 
@@ -95,19 +104,35 @@ class CifarC:
 
         # Vertically stacks the test images
         self.test_images = np.vstack([d[b"data"] for d in self.test_batch])
-        test_len = len(self.test_images)
+        self.test_len = len(self.test_images)
 
         # Reshapes and normalizes test images
-        self.test_images = self.test_images.reshape(test_len, CS_RGB, CIFAR_IMAGE_WIDTH, CIFAR_IMAGE_HEIGHT).transpose(0, 2, 3, 1) / COLOR_DEAPTH
+        self.test_images = self.test_images.reshape(self.test_len, self.cs_rgb, self.image_width, self.image_height).transpose(0, 2, 3, 1) / self.color_deapth
         # we want the shape to be [images, W, H, Channels]
         # One hot Encodes the test labels (e.g. [0,0,0,1,0,0,0,0,0,0])
         self.test_labels = one_hot_encode(np.hstack([d[b"labels"] for d in self.test_batch]), num_labels)
 
     def next_batch_train(self, batch_size):
-        if self.train_len - self.train_index < batch_size:
-            batch_size = self.train_len - self.train_index
+        """
+        return batch of images (x) and lables (y) according to batch_size
+        """
+        if self.training_len - self.train_index < batch_size:
+            batch_size = self.training_len - self.train_index
             # print_and_log_timestamp("end of set, using batch_size {}", batch_size)
-        x = self.training_images[self.train_index:self.train_index + batch_size].reshape(batch_size, CIFAR_IMAGE_WIDTH, CIFAR_IMAGE_HEIGHT, CS_RGB)
+        x = self.training_images[self.train_index:self.train_index + batch_size].reshape(batch_size, self.image_width, self.image_height, self.cs_rgb)
         y = self.training_labels[self.train_index:self.train_index + batch_size]
-        self.train_index = (self.train_index + batch_size) % len(self.training_images)
+        self.train_index = (self.train_index + batch_size) % self.training_len
+        return x, y
+        
+    def next_batch_train_overlap(self, batch_size, overlap = 0):
+        """
+        return batch of images (x) and lables (y) according to batch_size with overlap between batches
+        """
+        if self.training_len - self.train_index <= batch_size - overlap:
+            batch_size = self.training_len - self.train_index
+            # print_and_log_timestamp("end of set, using batch_size {}", batch_size)
+        if self.train_index - overlap < 0: overlap = 0
+        x = self.training_images[self.train_index - overlap:self.train_index + (batch_size - overlap)].reshape(batch_size, self.image_width, self.image_height, self.cs_rgb)
+        y = self.training_labels[self.train_index - overlap:self.train_index + (batch_size - overlap)]
+        self.train_index = (self.train_index + batch_size - overlap) % self.training_len
         return x, y
