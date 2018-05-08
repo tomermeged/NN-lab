@@ -78,14 +78,15 @@ def save_model(saver, sess):
     """
     save model, src and log and print a msg
     """
-    model_path = CM.MODEL_DIR + "/"
-    model_src_dir = model_path + CM.SRC + "/"
+    model_dir = CM.MODEL_DIR + "/"
+    model_path = model_dir + CM.CNNMODEL
+    model_src_dir = model_dir + CM.SRC + "/"
     print_and_log_timestamp("==================================================================================")
     print_and_log_timestamp("Saving model: {}", model_path)
     print_and_log_timestamp("==================================================================================")
-    create_dir(model_path)
+    create_dir(model_dir)
     saver.save(sess, model_path)
-    copyfile(CM.TEMP_LOG_FILE_PATH, model_path + "_" + CM.LOG_FILE_NAME)
+    copyfile(CM.TEMP_LOG_FILE_PATH, model_dir + "_" + CM.LOG_FILE_NAME)
     if not os.path.exists(model_src_dir):
         copytree(CM.TEMP_DIR_SRC, model_src_dir)
 
@@ -93,7 +94,7 @@ def restore_model(saver, sess, model_name):
     """
     restore saved model and print a msg
     """
-    model_path = CM.SAVED_MODELS_DIR + model_name + "/" + "CNNmodel"
+    model_path = CM.SAVED_MODELS_DIR + model_name + "/" + CM.CNNMODEL
     print_and_log_timestamp("==================================================================================")
     print_and_log_timestamp("restoring model: {}", model_path)
     print_and_log_timestamp("==================================================================================")

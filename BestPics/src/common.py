@@ -33,7 +33,7 @@ TEMP_DIR_SRC = TEMP_DIR + "src_{}/".format(TIMESTEMP)
 LOGS_DIR = "../logs/"
 TENSORBOARD_PATH = LOGS_DIR + "TB"
 SAVED_MODELS_DIR = "../saved_models/"
-MODEL_DIR = SAVED_MODELS_DIR + "Model_{}_".format(TIMESTEMP)
+MODEL_DIR = SAVED_MODELS_DIR + "Model_{}".format(TIMESTEMP)
 SRC = "/src/"
 
 LOG_FILE_NAME = TIMESTEMP + ".log.txt"
@@ -51,6 +51,8 @@ MAX_POOL = "max_pool"
 NORMALIZATION = "normalization"
 FLATEN_4DTO2D = "flaten_4Dto2D"
 DENSE = "dense"
+
+CNNMODEL = "CNNmodel"
 
 FIT_INPUT = "fit_input"
 

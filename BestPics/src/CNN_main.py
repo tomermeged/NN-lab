@@ -55,7 +55,7 @@ if len(BATCH_SIZE) != len(LEARNING_RATE):
 
 MOMENTUM = CM.OFF
 
-TRAIN_DROPOUT = 0.5
+TRAIN_DROPOUT = 0.8
 
 RUN_STEPS_FACTOR = 1
 #################################################
@@ -99,17 +99,34 @@ Cnn = CNN_generic.genericCNN(x)
 # LAYERS
 # add_layer args:
 #   type, layerSize, activation, kernelSize, stride, varInit, frac_ratio, dropout
-Cnn.add_layer(CM.CONVOLUTION, 32, "Leaky_ReLU")
-Cnn.add_layer(CM.MAX_POOL, 32, kernelSize = 3, stride = 3)
+Cnn.override_defaults(activation = "Leaky_ReLU", 
+                kernelSize = 2, 
+                stride = 1, 
+                varInit = [0.1, 0.2, 0.1, 0.003], 
+                frac_ratio = ["OFF", 0, 0], 
+                dropout = "OFF")
+
+
+Cnn.add_layer(CM.CONVOLUTION, 32, kernelSize = 4)
+Cnn.add_layer(CM.MAX_POOL, 32, frac_ratio=CM.FRAC_RATIO_125)
 Cnn.add_layer(CM.NORMALIZATION, 32)
-Cnn.add_layer(CM.CONVOLUTION, 32, "Leaky_ReLU")
-Cnn.add_layer(CM.MAX_POOL, 32, stride = 2, frac_ratio=CM.FRAC_RATIO_144)
-Cnn.add_layer(CM.CONVOLUTION, 32, "Leaky_ReLU")
-Cnn.add_layer(CM.MAX_POOL, 32, stride = 2, frac_ratio=CM.FRAC_RATIO_125_173)
-Cnn.add_layer(CM.MAX_POOL, 32, stride = 2)
+
+Cnn.add_layer(CM.CONVOLUTION, 64, kernelSize = 3)
+Cnn.add_layer(CM.MAX_POOL, 64, stride = 2)
+Cnn.add_layer(CM.NORMALIZATION, 64)
+
+Cnn.add_layer(CM.CONVOLUTION, 96, kernelSize = 3)
+Cnn.add_layer(CM.MAX_POOL, 96, stride = 2)
+
+Cnn.add_layer(CM.CONVOLUTION, 128)
+Cnn.add_layer(CM.MAX_POOL, 128, stride = 2)
+
+Cnn.add_layer(CM.CONVOLUTION, 256)
+Cnn.add_layer(CM.MAX_POOL, 256, stride = 2)
+
+
 Cnn.add_layer(CM.FLATEN_4DTO2D, None)
-Cnn.add_layer(CM.DENSE, 512, "ReLU", dropout=dropout)
-Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton")
+Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton", dropout=dropout)
 ##################################################################################################
 
 

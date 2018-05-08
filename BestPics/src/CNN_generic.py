@@ -29,22 +29,55 @@ class genericCNN:
         self.layer_ordinal = 0
         self.last_layer = None
 
+        self.activation = CM.RELU
+        self.kernelSize = 2
+        self.stride = 1
+        self.varInit = [0.1, 0.2, 0.1, 0.0]
+        self.frac_ratio = CM.FRAC_RATIO_OFF
+        self.dropout = CM.OFF
+
+
         with tf.name_scope("input"):
             layerObj = inputLayer(self.inputT)
             self.NNlayer.append([layerObj, layerObj.create_layer()])
 
-    def add_layer(self, type, layerSize, activation=CM.RELU, kernelSize=2, stride=1, varInit=[0.1, 0.2, 0.1, 0.0], frac_ratio=None, dropout=CM.OFF):
+    def override_defaults(self, activation=None, kernelSize=None, stride=None, varInit=None, frac_ratio=None, dropout=None):
+        """
+        will set new defaults for the following params:
+        :activation: "no_activation", "relu", "leaky_relu" ; default = "relu"
+        :kernelSize: for 2D layers, the kernel size (int) ; default = 2
+        :stride:     for 2D layers, the stride size (int ; default = 2
+        :varInit:    [bias_const, alpha_const, weight_sdev, weight_mean] ; default = [0.1, 0.2, 0.1, 0.0]
+        :frac_ratio: [ON/OFF, col_ratio, row_ratio] ; default = "off"
+        :dropout:    OFF/ dropout_value ; default = "off"
+        """
+        if activation != None:  self.activation = activation
+        if kernelSize != None:  self.kernelSize = kernelSize
+        if stride != None:      self.stride = stride
+        if varInit != None:     self.varInit = varInit
+        if frac_ratio != None:  self.frac_ratio = frac_ratio
+        if dropout != None:     self.dropout = dropout
+
+    def add_layer(self, type, layerSize, activation=None, kernelSize=None, stride=None, varInit=None, frac_ratio=None, dropout=None):
         """
         will add a layer to the model
-        :types:      FIT_INPUT, CONVOLUTION, MAX_POOL, NORMALIZATION, FLATEN_4DTO2D, DENSE
+        :types:      "fit_input", "convolution", "max_pool", "normalization", "flaten_4dto2d", "dense"
         :layerSize:  size of the layer (int)
-        :activation: NO_ACTIVATION, RELU, LEAKY_RELU
-        :kernelSize: for 2D layers, the kernel size (int)
-        :stride:     for 2D layers, the stride size (int)
-        :varInit:    [bias_const, alpha_const, weight_sdev, weight_mean]        
-        :frac_ratio: [ON/OFF, col_ratio, row_ratio]
-        :dropout:    OFF/ dropout_value
+        :activation: "no_activation", "relu", "leaky_relu" ; default = "relu"
+        :kernelSize: for 2D layers, the kernel size (int) ; default = 2
+        :stride:     for 2D layers, the stride size (int ; default = 2
+        :varInit:    [bias_const, alpha_const, weight_sdev, weight_mean] ; default = [0.1, 0.2, 0.1, 0.0]
+        :frac_ratio: [ON/OFF, col_ratio, row_ratio] ; default = "off"
+        :dropout:    OFF/ dropout_value ; default = "off"
         """
+
+        if activation == None:  activation = self.activation
+        if kernelSize == None:  kernelSize = self.kernelSize
+        if stride == None:      stride = self.stride
+        if varInit == None:     varInit = self.varInit
+        if frac_ratio == None:  frac_ratio = self.frac_ratio
+        if dropout == None:     dropout = self.dropout
+
         inputT=self.NNlayer[self.layer_ordinal][1]
 
         if layerSize == CM.FIT_INPUT:
@@ -91,3 +124,5 @@ class genericCNN:
         print_and_log("==================================================================================")
         print_and_log("Network Size:    {}", network_size)
         print_and_log("==================================================================================")
+
+

@@ -146,7 +146,7 @@ class convolutionLayer(Genlayer):  # S=size; inputT shape: [images, W, H, Channe
 
 
     def print_layer(self, layer_ordinal):
-        print_and_log("{}\t{}\t\t{}\t\t{}\t\t{}\t\t\tK={} ; S={}", layer_ordinal, self.type, self.outputT.shape, self.activation, self.dropout_str, self.kernelSize, self.stride)
+        print_and_log("{}\t{}\t\t{}\t\t{}\t\t\t{}\t\t\tK={} ; S={}", layer_ordinal, self.type, self.outputT.shape, self.activation, self.dropout_str, self.kernelSize, self.stride)
 
 
 class denseLayer():  # S=size; inputT shape: [images, W, H, Channels]
