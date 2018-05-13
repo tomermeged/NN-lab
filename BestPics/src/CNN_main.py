@@ -57,9 +57,9 @@ OVERLAP = CM.OFF
 MOMENTUM = 0.9
 RUN_STEPS_FACTOR = 1
 TRAIN_DROPOUT = 0.65
-LR_PROGRESSION = 10 # in epochs
-BATCH_SIZE = CM.BS_80 + CM.BS_100 + CM.BS_128 + CM.BS_1000 * 12
-LEARNING_RATE = CM.LR_003 + CM.LR_003 + CM.LR_003 + CM.LR_0001 * 12
+LR_PROGRESSION = 15 # in epochs
+BATCH_SIZE = CM.BS_32 * 10
+LEARNING_RATE = CM.LR_003  * 10
 NUM_EPOCHS = len(BATCH_SIZE) * LR_PROGRESSION
 
 if len(BATCH_SIZE) != len(LEARNING_RATE):
@@ -212,7 +212,7 @@ else:
             else:
                 run_steps = math.ceil(CIFR.training_len / (batch_size - OVERLAP) * RUN_STEPS_FACTOR)
             if run_steps == 0: run_steps = 1
-            run_steps_mod = run_steps // 10
+            run_steps_mod = math.ceil(run_steps / 10)
             print_and_log_timestamp("epoch {}/{}: will run {} steps with batch_size {} ; lr={}", epoch+1, NUM_EPOCHS, run_steps, batch_size, lr)
             for step in range(run_steps):
                 if OVERLAP == CM.OFF:
@@ -225,8 +225,6 @@ else:
                 if step % run_steps_mod == 0: print_timestamp("step {}", step)
 
             train_accuracy = sess.run(acc, feed_dict=feed_dict_train)
-            # train_accuracy, summary = sess.run([acc_1, merged_train], feed_dict=feed_dict_train)
-            # writer.add_summary(summary, epoch)
 
             print_and_log_timestamp("epoch {}/{}: train accuracy is {}", epoch+1, NUM_EPOCHS, train_accuracy)
             if train_accuracy < MIN_ACCURACY_DISCARD and epoch >= MIN_EPOCHS_DISCARD:
