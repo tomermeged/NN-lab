@@ -102,10 +102,3 @@ def restore_model(saver, sess, model_name):
     saver.restore(sess, model_path)
 
 
-# LOGGING
-create_dir(CM.LOGS_DIR)
-create_dir(CM.TEMP_DIR)
-print_and_log("temp log file path: {}", CM.TEMP_LOG_FILE_PATH)
-print_and_log("real log file path: {}", CM.LOG_FILE_PATH)
-print_and_log("TensorBoard path: {}", CM.TENSORBOARD_PATH)
-copytree(CM.SRC_DIR, CM.TEMP_DIR_SRC)

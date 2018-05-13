@@ -17,12 +17,21 @@ from utilities import print_timestamp
 from utilities import calc_params
 from utilities import save_model
 from utilities import restore_model
+from utilities import create_dir
 
 from cifar_10_handler import CifarC
 from cifar_10_handler import num_labels
 
 import CNN_generic
 
+
+# LOGGING
+create_dir(CM.LOGS_DIR)
+create_dir(CM.TEMP_DIR)
+print_and_log("temp log file path: {}", CM.TEMP_LOG_FILE_PATH)
+print_and_log("real log file path: {}", CM.LOG_FILE_PATH)
+print_and_log("TensorBoard path: {}", CM.TENSORBOARD_PATH)
+copytree(CM.SRC_DIR, CM.TEMP_DIR_SRC) # backing up current code
 
 #################################################
 # CONSTS
@@ -45,12 +54,12 @@ TRAINED_MODEL_NAME = "Model_20180512_100505" # when restoring a model
 #################################################
 # TRAINING PARAMS
 OVERLAP = CM.OFF
-MOMENTUM = CM.OFF
+MOMENTUM = 0.9
 RUN_STEPS_FACTOR = 1
 TRAIN_DROPOUT = 0.65
 LR_PROGRESSION = 10 # in epochs
-BATCH_SIZE = CM.BS_80 * 15
-LEARNING_RATE = CM.LR_003 * 15
+BATCH_SIZE = CM.BS_80 + CM.BS_100 + CM.BS_128 + CM.BS_1000 * 12
+LEARNING_RATE = CM.LR_003 + CM.LR_003 + CM.LR_003 + CM.LR_0001 * 12
 NUM_EPOCHS = len(BATCH_SIZE) * LR_PROGRESSION
 
 if len(BATCH_SIZE) != len(LEARNING_RATE):
@@ -97,7 +106,7 @@ Cnn = CNN_generic.genericCNN(x, CIFR.cs_rgb)
 # LAYERS
 # add_layer args:
 #   type, layerSize, activation, kernelSize, stride, varInit, frac_ratio, dropout
-Cnn.override_defaults(activation = "ELU", 
+Cnn.override_defaults(activation = CM.LEAKY_RELU, 
                 kernelSize = 2, 
                 stride = [1, 1], 
                 varInit = [0.1, 0.2, 0.1, 0.003], 
@@ -203,6 +212,7 @@ else:
             else:
                 run_steps = math.ceil(CIFR.training_len / (batch_size - OVERLAP) * RUN_STEPS_FACTOR)
             if run_steps == 0: run_steps = 1
+            run_steps_mod = run_steps // 10
             print_and_log_timestamp("epoch {}/{}: will run {} steps with batch_size {} ; lr={}", epoch+1, NUM_EPOCHS, run_steps, batch_size, lr)
             for step in range(run_steps):
                 if OVERLAP == CM.OFF:
@@ -212,7 +222,7 @@ else:
                 feed_dict_train={ x: batch_x_train, y_true: batch_y_train, dropout: train_dropout, learning_rate: lr}
                 sess.run(train, feed_dict=feed_dict_train)
 
-                if step % 50 == 0: print_timestamp("step {}", step)
+                if step % run_steps_mod == 0: print_timestamp("step {}", step)
 
             train_accuracy = sess.run(acc, feed_dict=feed_dict_train)
             # train_accuracy, summary = sess.run([acc_1, merged_train], feed_dict=feed_dict_train)
@@ -228,6 +238,7 @@ else:
                 print_and_log_timestamp("epoch {}/{}: test accuracy is {}", epoch+1, NUM_EPOCHS, test_accuracy)
                 if test_accuracy > best_test_accuracy:
                     best_test_accuracy = test_accuracy # updating best test accuracy
+                    best_test_accuracy_epoch = epoch
                     save_model(saver, sess) # save model
                 if train_accuracy - test_accuracy > DROPOUT_UPDATE_MIN_GAP and train_dropout > MIN_DROPOUT:
                     train_dropout = train_dropout * DROPOUT_UPDATE_FACTOR # updating dropout
@@ -237,6 +248,7 @@ else:
         writer.close()
     print_and_log('\n')
 
+print_and_log_timestamp(" best accuracy {}, at epoch {}", best_test_accuracy, best_test_accuracy_epoch)
 print_and_log_timestamp(" END session! {}", datetime.datetime.now().strftime("%H:%M:%S"))
 copyfile(CM.TEMP_LOG_FILE_PATH, CM.LOG_FILE_PATH)
 
