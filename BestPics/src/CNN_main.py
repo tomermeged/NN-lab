@@ -75,11 +75,9 @@ def test_model(sess, y_pred, y_true, feed_dict_test, writer=None, merged=None, e
     matches = tf.equal(tf.argmax(y_pred,1),tf.argmax(y_true,1))
     acc = tf.reduce_mean(tf.cast(matches,tf.float32))
 
-    # if writer != None and merged != None and epoch != None:
+    
     result, summary = sess.run([acc, merged], feed_dict=feed_dict_test)
     writer.add_summary(summary, epoch)
-    # else:
-        # result = sess.run(acc, feed_dict=feed_dict_test)
     return result
 #################################################
 
