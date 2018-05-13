@@ -59,6 +59,7 @@ FIT_INPUT = "fit_input"
 NO_ACTIVATION = "NoActivaton"
 RELU = "ReLU"
 LEAKY_RELU = "Leaky_ReLU"
+ELU = "ELU"
 
 ON = "ON"
 OFF = "OFF"
@@ -72,12 +73,15 @@ SEED = 1101
 
 #################################################
 # TOOLBOX
-FRAC_RATIO_OFF = [OFF, 0, 0]
-FRAC_RATIO_144 = [ON, 1.44, 1.44]
-FRAC_RATIO_125 = [ON, 1.25, 1.25]
-FRAC_RATIO_125_173 = [ON, 1.25, 1.73]
-FRAC_RATIO_173_125 = [ON, 1.73, 1.25]
-FRAC_RATIO_15_2 = [ON, 1.5, 2]
+STRIDE_1 = [1, 1]
+STRIDE_2 = [2, 2]
+STRIDE_3 = [3, 3]
+STRIDE_4 = [4, 4]
+STRIDE_15_2 = [1.5, 2]
+STRIDE_144 = [1.44, 1.44]
+STRIDE_125 = [1.25, 1.25]
+STRIDE_125_173 = [1.25, 1.73]
+STRIDE_173_125 = [1.73, 1.25]
 
 BIAS_CONST = 0.1
 ALPHA_CONST = 0.2
@@ -87,12 +91,20 @@ INIT_VARS = [BIAS_CONST, ALPHA_CONST, WEIGHT_SDEV, WEIGHT_MEAN]
 
 BS_80 = [80]
 BS_100 = [100]
+BS_128 = [128]
 BS_1000 = [1000]
+BS_1200 = [1200]
+BS_1500 = [1500]
 
+LR_25 = [0.25]
+LR_1 = [0.1]
+LR_05 = [0.05]
+LR_01 = [0.01]
 LR_003 = [0.003]
 LR_001 = [0.001]
 LR_0005 = [0.0005]
 LR_0001 = [0.0001]
+LR_00001 = [0.00001]
 #################################################
 # FLAGS
 

@@ -34,30 +34,30 @@ MIN_ACCURACY_DISCARD = 0.2
 MIN_EPOCHS_DISCARD = 3
 MIN_DROPOUT = 0.3
 DROPOUT_UPDATE_MIN_GAP = 0.1
-DROPOUT_UPDATE_FACTOR = 0.9
+DROPOUT_UPDATE_FACTOR = 0.95
 
 #################################################
 # CONTROLS
 TEST_ONLY = CM.OFF
 TRAIN_AGAIN = CM.OFF
-TRAINED_MODEL_NAME = "Model_20180411_154603_Boost" # when restoring a model
+TRAINED_MODEL_NAME = "Model_20180512_100505" # when restoring a model
 
 #################################################
 # TRAINING PARAMS
-LR_PROGRESSION = 7 # in epochs
-BATCH_SIZE = CM.BS_100 + CM.BS_100 + CM.BS_100 + CM.BS_1000
 OVERLAP = CM.OFF
+MOMENTUM = CM.OFF
+RUN_STEPS_FACTOR = 1
+TRAIN_DROPOUT = 0.65
+LR_PROGRESSION = 10 # in epochs
+BATCH_SIZE = CM.BS_80 * 15
+LEARNING_RATE = CM.LR_003 * 15
 NUM_EPOCHS = len(BATCH_SIZE) * LR_PROGRESSION
-LEARNING_RATE = CM.LR_003 + CM.LR_001 + CM.LR_0005 + CM.LR_0001
 
 if len(BATCH_SIZE) != len(LEARNING_RATE):
     exit(2)
 
-MOMENTUM = CM.OFF
 
-TRAIN_DROPOUT = 0.8
 
-RUN_STEPS_FACTOR = 1
 #################################################
 #################################################
 # FUNCTIONS
@@ -94,39 +94,43 @@ learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
 print_params()
 
-Cnn = CNN_generic.genericCNN(x)
+Cnn = CNN_generic.genericCNN(x, CIFR.cs_rgb)
 ##################################################################################################
 # LAYERS
 # add_layer args:
 #   type, layerSize, activation, kernelSize, stride, varInit, frac_ratio, dropout
-Cnn.override_defaults(activation = "Leaky_ReLU", 
+Cnn.override_defaults(activation = "ELU", 
                 kernelSize = 2, 
-                stride = 1, 
+                stride = [1, 1], 
                 varInit = [0.1, 0.2, 0.1, 0.003], 
-                frac_ratio = ["OFF", 0, 0], 
                 dropout = "OFF")
 
 
 Cnn.add_layer(CM.CONVOLUTION, 32, kernelSize = 4)
-Cnn.add_layer(CM.MAX_POOL, 32, frac_ratio=CM.FRAC_RATIO_125)
-Cnn.add_layer(CM.NORMALIZATION, 32)
+Cnn.add_layer(CM.MAX_POOL, kernelSize = 3, stride = CM.STRIDE_2)
 
-Cnn.add_layer(CM.CONVOLUTION, 64, kernelSize = 3)
-Cnn.add_layer(CM.MAX_POOL, 64, stride = 2)
-Cnn.add_layer(CM.NORMALIZATION, 64)
+Cnn.add_layer(CM.NORMALIZATION)
+Cnn.add_layer(CM.CONVOLUTION, 64)
+Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
-Cnn.add_layer(CM.CONVOLUTION, 96, kernelSize = 3)
-Cnn.add_layer(CM.MAX_POOL, 96, stride = 2)
+Cnn.add_layer(CM.NORMALIZATION)
+Cnn.add_layer(CM.CONVOLUTION, 128, dropout = dropout)
+Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
-Cnn.add_layer(CM.CONVOLUTION, 128)
-Cnn.add_layer(CM.MAX_POOL, 128, stride = 2)
+Cnn.add_layer(CM.NORMALIZATION)
+Cnn.add_layer(CM.CONVOLUTION, 256, dropout = dropout)
+Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
-Cnn.add_layer(CM.CONVOLUTION, 256)
-Cnn.add_layer(CM.MAX_POOL, 256, stride = 2)
+Cnn.add_layer(CM.NORMALIZATION)
+Cnn.add_layer(CM.CONVOLUTION, 384, dropout = dropout)
+Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
+Cnn.add_layer(CM.NORMALIZATION)
+Cnn.add_layer(CM.CONVOLUTION, 512, dropout = dropout)
+Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
 Cnn.add_layer(CM.FLATEN_4DTO2D, None)
-Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton", dropout=dropout)
+Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton")
 ##################################################################################################
 
 
@@ -134,7 +138,7 @@ Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton", dropout=dropout)
 Cnn.print_model_params()
 # output Layer
 with tf.name_scope("output_Layer"):
-    y_pred = Cnn.NNlayer[Cnn.layer_ordinal][1]
+    y_pred = Cnn.NNlayer[Cnn.layer_ordinal].outputT
 
 # SOFTMAX and LOSS FUNCTION
 with tf.name_scope("loss"):
@@ -229,7 +233,7 @@ else:
                     save_model(saver, sess) # save model
                 if train_accuracy - test_accuracy > DROPOUT_UPDATE_MIN_GAP and train_dropout > MIN_DROPOUT:
                     train_dropout = train_dropout * DROPOUT_UPDATE_FACTOR # updating dropout
-                    print_and_log_timestamp("updating dropout value to {}", train_dropout)
+                    print_and_log_timestamp("**** updating dropout value to {} ****", train_dropout)
 
 
         writer.close()

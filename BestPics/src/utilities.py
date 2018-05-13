@@ -81,10 +81,10 @@ def save_model(saver, sess):
     model_dir = CM.MODEL_DIR + "/"
     model_path = model_dir + CM.CNNMODEL
     model_src_dir = model_dir + CM.SRC + "/"
+    create_dir(model_dir)
     print_and_log_timestamp("==================================================================================")
     print_and_log_timestamp("Saving model: {}", model_path)
     print_and_log_timestamp("==================================================================================")
-    create_dir(model_dir)
     saver.save(sess, model_path)
     copyfile(CM.TEMP_LOG_FILE_PATH, model_dir + "_" + CM.LOG_FILE_NAME)
     if not os.path.exists(model_src_dir):
