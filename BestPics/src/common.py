@@ -37,12 +37,12 @@ MODEL_DIR = SAVED_MODELS_DIR + "Model_{}".format(TIMESTEMP)
 SRC = "/src/"
 
 LOG_FILE_NAME = TIMESTEMP + ".log.txt"
+LOG_FILE_PATH = LOGS_DIR + LOG_FILE_NAME
+
 TEMP_LOG_FILE_PATH = TEMP_DIR + LOG_FILE_NAME # start with temp dir
+
 MAIN_FILE_NAME = "CNN_main.py"
 COMMON_FILE_NAME = "common.py"
-
-
-LOG_FILE_PATH = LOGS_DIR + "_" + LOG_FILE_NAME
 
 #################################################
 # NAMES
