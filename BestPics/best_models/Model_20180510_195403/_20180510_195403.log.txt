@@ -1,0 +1,84 @@
+temp log file path: ../temp/20180510_195403.log.txt
+real log file path: ../logs/_20180510_195403.log.txt
+TensorBoard path: ../logs/TB
+Setting Up Training Images and Labels
+Setting Up Test Images and Labels
+==================================================================================
+seed:            1101
+==================================================================================
+learning_rate    [0.0005, 0.0005, 0.0005, 0.0001] every 10 epochs
+momentum         OFF
+train_dropout    0.65
+==================================================================================
+#    type             shape		        activation		dropout     additional
+------------------+-------------------+----------------+-----------+-------------------
+0	input			(?, 32, 32, 3)
+1	convolution		(?, 32, 32, 32)		Leaky_ReLU			OFF			K=4 ; S=[1, 1]
+2	max_pool		(?, 16, 16, 32)									K=3 ; S=[2, 2]
+3	normalization	(?, 16, 16, 32)
+4	convolution		(?, 16, 16, 64)		Leaky_ReLU			OFF			K=2 ; S=[1, 1]
+5	max_pool		(?, 11, 11, 64)									K=2 ; S=[1.44, 1.44]
+6	normalization	(?, 11, 11, 64)
+7	convolution		(?, 11, 11, 128)		Leaky_ReLU			ON			K=2 ; S=[1, 1]
+8	max_pool		(?, 7, 7, 128)									K=2 ; S=[1.44, 1.44]
+9	normalization	(?, 7, 7, 128)
+10	convolution		(?, 7, 7, 256)		Leaky_ReLU			ON			K=2 ; S=[1, 1]
+11	max_pool		(?, 4, 4, 256)									K=2 ; S=[1.44, 1.44]
+12	normalization	(?, 4, 4, 256)
+13	convolution		(?, 4, 4, 384)		Leaky_ReLU			ON			K=2 ; S=[1, 1]
+14	max_pool		(?, 2, 2, 384)									K=2 ; S=[1.44, 1.44]
+15	normalization	(?, 2, 2, 384)
+16	convolution		(?, 2, 2, 512)		Leaky_ReLU			ON			K=2 ; S=[1, 1]
+17	max_pool		(?, 1, 1, 512)									K=2 ; S=[1.44, 1.44]
+18	flaten4Dto2D	(?, 512)
+19	dense			(?, 10)		NoActivaton		OFF
+==================================================================================
+Network Size:    1362836
+==================================================================================
+2018.05.10 19:54:08 START session:
+0:00:05.073290 ==================================================================================
+0:00:05.074290 restoring model: ../saved_models/Model_20180510_161115/CNNmodel
+0:00:05.075290 ==================================================================================
+0:00:18.415053 epoch 0/40: test accuracy is 0.805400013923645
+0:00:18.416053 epoch 1/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:05:21.745403 epoch 1/40: train accuracy is 0.8287500143051147
+0:05:35.260176 epoch 1/40: test accuracy is 0.8055999875068665
+0:05:35.267176 creating  Dir: ../saved_models/Model_20180510_195403/
+0:05:35.270176 ==================================================================================
+0:05:35.271176 Saving model: ../saved_models/Model_20180510_195403/CNNmodel
+0:05:35.272177 ==================================================================================
+0:05:35.575194 epoch 2/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:10:35.600991 epoch 2/40: train accuracy is 0.8349999785423279
+0:10:48.680219 epoch 2/40: test accuracy is 0.803600013256073
+0:10:48.695819 epoch 3/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:15:42.406864 epoch 3/40: train accuracy is 0.8199999928474426
+0:15:55.579516 epoch 3/40: test accuracy is 0.8112999796867371
+0:15:55.595116 ==================================================================================
+0:15:55.595116 Saving model: ../saved_models/Model_20180510_195403/CNNmodel
+0:15:55.595116 ==================================================================================
+0:15:55.844717 epoch 4/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:20:49.871681 epoch 4/40: train accuracy is 0.793749988079071
+0:20:49.873681 epoch 5/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:25:44.356617 epoch 5/40: train accuracy is 0.8274999856948853
+0:25:57.727056 epoch 5/40: test accuracy is 0.8021000027656555
+0:25:57.742656 epoch 6/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:30:55.954676 epoch 6/40: train accuracy is 0.8424999713897705
+0:31:09.178193 epoch 6/40: test accuracy is 0.8133000135421753
+0:31:09.178193 ==================================================================================
+0:31:09.178193 Saving model: ../saved_models/Model_20180510_195403/CNNmodel
+0:31:09.193793 ==================================================================================
+0:31:09.443393 epoch 7/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:36:05.455614 epoch 7/40: train accuracy is 0.8337500095367432
+0:36:18.673260 epoch 7/40: test accuracy is 0.805899977684021
+0:36:18.673260 epoch 8/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:41:13.808118 epoch 8/40: train accuracy is 0.8162500262260437
+0:41:27.068555 epoch 8/40: test accuracy is 0.800000011920929
+0:41:27.068555 epoch 9/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:46:17.262024 epoch 9/40: train accuracy is 0.8362500071525574
+0:46:30.323653 epoch 9/40: test accuracy is 0.8130000233650208
+0:46:30.323653 epoch 10/40: will run 42 steps with batch_size 1200 ; lr=0.0005
+0:51:21.543621 epoch 10/40: train accuracy is 0.8287500143051147
+0:51:34.443848 epoch 10/40: test accuracy is 0.8145999908447266
+0:51:34.443848 ==================================================================================
+0:51:34.443848 Saving model: ../saved_models/Model_20180510_195403/CNNmodel
+0:51:34.443848 ==================================================================================
