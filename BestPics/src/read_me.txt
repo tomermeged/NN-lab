@@ -13,16 +13,18 @@ Installation:
         anaconda navigator app with the correct env activated
     
     
-2. install pycharm - first time only
+3. install pycharm - first time only
 
-3. configure new project in pycharm
+4. configure new project in pycharm
 	a. project location
 	b. interperter - Conda - new env
 	c. install tensorFlow in the same env location
 	
-4. How to run:
-	a. Load the desired project
-	b. Right click on the <main>.py file and click on "run " option
+
+How to run:
+1. open pyCharm
+2. Load the desired project
+3. Right click on the <main>.py file and click on "run " option
 	
 to use tensorboard explicitly from the termial:
 "C:\Users\tomermeged\Anaconda3\envs\tensorflow\Scripts\tensorboard.exe" --logdir="Users\tomermeged\Dropbox\projects\MachineLearning\Lynda\Ex_Files_TensorFlow\Exercise Files\04\logs"
