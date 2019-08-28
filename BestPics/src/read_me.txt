@@ -29,6 +29,24 @@ to use tensorboard explicitly from the termial:
 "C:\Users\tomermeged\Anaconda3\envs\tensorflow\Scripts\tensorboard.exe" --logdir="06\logs"
     
 ---------------------------
+using git:
+1. open 'Git Bash' app
+2. cd "C:\Users\tomermeged\Dropbox\projects\MachineLearning\NN-lab"
+3. now you can use all the known git cmd: 
+    git status
+    git add <filenames>
+    git commit -m "<commit name>"
+    git push origin master
+4. if git push doesn't work, check the ssh keys
+    a. check for existing keys:
+        ls -al ~/.ssh
+    b. display current key:
+        cat ~/.ssh/id_rsa.pub
+    c. copy paste into the github wesite:
+        settings --> SSH and GPG keys --> SSH keys --> new SSH key
+
+    
+---------------------------
 to install additional python packages - use the anaconda prompt
 
 
