@@ -1,21 +1,28 @@
 Installation:
 
-	1. install Anaconda - first time only
-	2.  From anaconda prompt: (or CMD)
-	   *if env is allready set,  you can use the anaconda navigator app to open the prompt with the correct env activated
-	   
-	   if not go and create the env:
-		a.  cd "C:\Users\tomermeged\Dropbox\projects\MachineLearning\Udemy\complete-guide-to-tensorflow-for-deep-learning-with-python\Tensorflow-Bootcamp-master"
-		b.  conda env create -f tfdl_env.yml - first time only!!
-		c.  Once the env is done - open anaconda prompt from the anaconda navigator app with the correct env activated
-	    
-	    
-	3.  install pycharm - first time only
+	1. install Anaconda (also add to path)- first time only
+	*NOTE: new anaconda version has issues with YML defs, need to use 3.5.1.0 for this to work
+			From:
+			https://repo.continuum.io/archive/Anaconda3-5.1.0-Windows-x86_64.exe
+	 
+	2. install pycharm - first time only
 
 	4. configure new project in pycharm
-	a. project location
-	b. interperter - Conda - new env
-	c. install tensorFlow in the same env location
+		a. Add new project
+		b. 
+		c. Define interpeter:
+		File --> settings-> project <namr> --> project interpeter --> dropdown list --> show all --> '+' --> add local --> conda environment
+		--> new_env --> cooshe location 
+		*inside the anaconda install dir there is a folder called 'env', 
+		e.g. 
+			E:\tomermeg\MachineLearning\Anaconda3\envs
+			
+	5. Upgrade tensorflow
+	conda install tensorflow
+	
+	Other options that work:
+	pip install --upgrade tensorflow==1.5.0
+	pip install --upgrade tensorflow==1.9.0
 	
 How to run:
 	1. open pyCharm
@@ -25,9 +32,11 @@ How to run:
 to use tensorboard explicitly from the termial:
 "C:\Users\tomermeged\Anaconda3\envs\tensorflow\Scripts\tensorboard.exe" --logdir="Users\tomermeged\Dropbox\projects\MachineLearning\Lynda\Ex_Files_TensorFlow\Exercise Files\04\logs"
 "C:\Users\tomermeged\Anaconda3\envs\tensorflow\Scripts\tensorboard.exe" --logdir="06\logs"
+
+"E:\tomermeg\MachineLearning\Anaconda3\envs\NN-lab1\Scripts\tensorboard.exe" --logdir "C:\Users\tomermeged\Dropbox\projects\MachineLearning\NN-lab\BestPics\best_models\Model_20180510_195403\logs\TB"
     
 ---------------------------
-using git:
+using git: https://github.com/tomermeged/NN-lab
 	1.  open 'Git Bash' app
 	2. cd "C:\Users\tomermeged\Dropbox\projects\MachineLearning\NN-lab"
 	3. now you can use all the known git cmd: 
@@ -65,3 +74,6 @@ Pip install Gym (openAI - reinforcement learning "gym.openai.com")
 
 conda install pandas
 conda install -c conda-forge google-api-python-client
+
+
+
