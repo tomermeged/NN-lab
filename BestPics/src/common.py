@@ -46,6 +46,8 @@ COMMON_FILE_NAME = "common.py"
 
 #################################################
 # NAMES
+INPUT = "input"
+OUTPUT = "output"
 CONVOLUTION = "convolution"
 MAX_POOL = "max_pool"
 NORMALIZATION = "normalization"
@@ -99,6 +101,15 @@ BS_512 = [512]
 BS_1024 = [1024]
 BS_1280 = [1280]
 BS_1536 = [1536]
+
+BS_50 = [50]
+BS_80 = [80]
+BS_100 = [100]
+BS_200 = [200]
+BS_500 = [500]
+BS_1000 = [1000]
+BS_1200 = [1200]
+BS_1500 = [1500]
 
 LR_25 = [0.25]
 LR_1 = [0.1]

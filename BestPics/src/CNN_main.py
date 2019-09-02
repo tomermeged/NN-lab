@@ -36,11 +36,11 @@ copytree(CM.SRC_DIR, CM.TEMP_DIR_SRC) # backing up current code
 #################################################
 # CONSTS
 TEST_DROPOUT = 1.0
-TEST_LR = 1
+TEST_LR = 1 
 BEST_ACCURACY_THRESHOLD = 0.7
 MIN_EPOCHS_TO_SAVE = 7
 MIN_ACCURACY_DISCARD = 0.2
-MIN_EPOCHS_DISCARD = 3
+MIN_EPOCHS_DISCARD = 5
 MIN_DROPOUT = 0.3
 DROPOUT_UPDATE_MIN_GAP = 0.1
 DROPOUT_UPDATE_FACTOR = 0.95
@@ -54,15 +54,16 @@ TRAINED_MODEL_NAME = "Model_20180512_100505" # when restoring a model
 #################################################
 # TRAINING PARAMS
 OVERLAP = CM.OFF
-MOMENTUM = 0.9
+MOMENTUM = CM.OFF
 RUN_STEPS_FACTOR = 1
 TRAIN_DROPOUT = 0.65
-LR_PROGRESSION = 15 # in epochs
-BATCH_SIZE = CM.BS_32 * 10
-LEARNING_RATE = CM.LR_003  * 10
+LR_PROGRESSION = 3 # in epochs
+BATCH_SIZE = CM.BS_32
+LEARNING_RATE = CM.LR_003
 NUM_EPOCHS = len(BATCH_SIZE) * LR_PROGRESSION
 
 if len(BATCH_SIZE) != len(LEARNING_RATE):
+    print_and_log("ERROR: len(BATCH_SIZE) != len(LEARNING_RATE)")
     exit(2)
 
 
@@ -116,25 +117,25 @@ Cnn.override_defaults(activation = CM.LEAKY_RELU,
 Cnn.add_layer(CM.CONVOLUTION, 32, kernelSize = 4)
 Cnn.add_layer(CM.MAX_POOL, kernelSize = 3, stride = CM.STRIDE_2)
 
-Cnn.add_layer(CM.NORMALIZATION)
-Cnn.add_layer(CM.CONVOLUTION, 64)
-Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
-
-Cnn.add_layer(CM.NORMALIZATION)
-Cnn.add_layer(CM.CONVOLUTION, 128, dropout = dropout)
-Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
-
-Cnn.add_layer(CM.NORMALIZATION)
-Cnn.add_layer(CM.CONVOLUTION, 256, dropout = dropout)
-Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
-
-Cnn.add_layer(CM.NORMALIZATION)
-Cnn.add_layer(CM.CONVOLUTION, 384, dropout = dropout)
-Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
-
-Cnn.add_layer(CM.NORMALIZATION)
-Cnn.add_layer(CM.CONVOLUTION, 512, dropout = dropout)
-Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
+# Cnn.add_layer(CM.NORMALIZATION)
+# Cnn.add_layer(CM.CONVOLUTION, 64)
+# Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
+#
+# Cnn.add_layer(CM.NORMALIZATION)
+# Cnn.add_layer(CM.CONVOLUTION, 128, dropout = dropout)
+# Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
+#
+# Cnn.add_layer(CM.NORMALIZATION)
+# Cnn.add_layer(CM.CONVOLUTION, 256, dropout = dropout)
+# Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
+#
+# Cnn.add_layer(CM.NORMALIZATION)
+# Cnn.add_layer(CM.CONVOLUTION, 384, dropout = dropout)
+# Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
+#
+# Cnn.add_layer(CM.NORMALIZATION)
+# Cnn.add_layer(CM.CONVOLUTION, 512, dropout = dropout)
+# Cnn.add_layer(CM.MAX_POOL, stride = CM.STRIDE_144)
 
 Cnn.add_layer(CM.FLATEN_4DTO2D, None)
 Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton")
@@ -144,7 +145,7 @@ Cnn.add_layer(CM.DENSE, num_labels, "NoActivaton")
 
 Cnn.print_model_params()
 # output Layer
-with tf.name_scope("output_Layer"):
+with tf.name_scope(CM.OUTPUT):
     y_pred = Cnn.NNlayer[Cnn.layer_ordinal].outputT
 
 # SOFTMAX and LOSS FUNCTION
@@ -168,19 +169,20 @@ with tf.name_scope("test_accuracy"):
     tf.summary.scalar('test_accuracy', acc)
     merged_test = tf.summary.merge_all()
 
-
 # RUN PREPERATIONS
 saver = tf.train.Saver() # so we can save the model
 init_vars = tf.global_variables_initializer()
 feed_dict_test={x: CIFR.test_images, y_true: CIFR.test_labels, dropout: TEST_DROPOUT, learning_rate: TEST_LR}
+feed_dict_train={x: CIFR.training_images_shuffled[:10000], y_true: CIFR.training_labels_shuffled[:10000], dropout: TEST_DROPOUT, learning_rate: TEST_LR}
 train_dropout = TRAIN_DROPOUT # initial dropout value
 best_test_accuracy = BEST_ACCURACY_THRESHOLD
+trainThresholdCrossed = 0
 print_and_log("{} START session:", datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S"))
 
 if TEST_ONLY == CM.ON:
     # TEST ALREADY TRAINED MODEL:
     with tf.Session() as sess:
-        writer = tf.summary.FileWriter(TCM.ENSORBOARD_PATH, sess.graph)
+        writer = tf.summary.FileWriter(CM.TENSORBOARD_PATH, sess.graph)
         # RESTORE MODEL
         restore_model(sess, TRAINED_MODEL_NAME) # supplying the same name - it's not a filename!!
         # TEST MODEL
@@ -200,7 +202,7 @@ else:
 
         test_accuracy, test_summary = sess.run([acc, merged_test], feed_dict=feed_dict_test)
         writer.add_summary(test_summary, 0)
-        print_and_log_timestamp("epoch {}/{}: test accuracy is {}", 0, NUM_EPOCHS, test_accuracy)
+        print_and_log_timestamp("epoch {}/{}: initial test accuracy is {}", 0, NUM_EPOCHS, test_accuracy)
 
         for epoch in range(NUM_EPOCHS):
             if epoch > MIN_EPOCHS_TO_SAVE: copyfile(CM.TEMP_LOG_FILE_PATH, CM.LOG_FILE_PATH)
@@ -219,8 +221,8 @@ else:
                     batch_x_train, batch_y_train = CIFR.next_batch_train(batch_size)
                 else:
                     batch_x_train, batch_y_train = CIFR.next_batch_train_overlap(batch_size, OVERLAP)
-                feed_dict_train={ x: batch_x_train, y_true: batch_y_train, dropout: train_dropout, learning_rate: lr}
-                sess.run(train, feed_dict=feed_dict_train)
+                feed_dict_train_batch={ x: batch_x_train, y_true: batch_y_train, dropout: train_dropout, learning_rate: lr}
+                sess.run(train, feed_dict=feed_dict_train_batch)
 
                 if step % run_steps_mod == 0: print_timestamp("step {}", step)
 
@@ -233,8 +235,9 @@ else:
             if train_accuracy > best_test_accuracy:
                 test_accuracy, test_summary = sess.run([acc, merged_test], feed_dict=feed_dict_test)
                 writer.add_summary(test_summary, epoch)
-                print_and_log_timestamp("epoch {}/{}: test accuracy is {}", epoch+1, NUM_EPOCHS, test_accuracy)
+                print_and_log_timestamp("epoch {}/{}: test accuracy is {} / ({})", epoch+1, NUM_EPOCHS, test_accuracy, best_test_accuracy)
                 if test_accuracy > best_test_accuracy:
+                    trainThresholdCrossed = 1
                     best_test_accuracy = test_accuracy # updating best test accuracy
                     best_test_accuracy_epoch = epoch
                     save_model(saver, sess) # save model
@@ -246,7 +249,11 @@ else:
         writer.close()
     print_and_log('\n')
 
-print_and_log_timestamp(" best accuracy {}, at epoch {}", best_test_accuracy, best_test_accuracy_epoch)
+if trainThresholdCrossed == 1:
+    print_and_log_timestamp(" best test accuracy {}, at epoch {}", best_test_accuracy, best_test_accuracy_epoch)
+else:
+    print_and_log_timestamp(" training threshold ({}) was not crossed, try again", BEST_ACCURACY_THRESHOLD)
+
 print_and_log_timestamp(" END session! {}", datetime.datetime.now().strftime("%H:%M:%S"))
 copyfile(CM.TEMP_LOG_FILE_PATH, CM.LOG_FILE_PATH)
 

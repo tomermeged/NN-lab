@@ -14,6 +14,7 @@
 
 import common as CM
 import numpy as np
+import random
 
 from utilities import print_and_log
 from utilities import print_and_log_timestamp
@@ -66,9 +67,7 @@ class CifarC:
     def __init__(self):
         self.train_index = 0
 
-        # Grabs a list of all the data batches for training
         self.all_train_batches = [data_batch1, data_batch2, data_batch3, data_batch4, data_batch5]
-        # Grabs a list of all the test batches (really just one batch)
         self.test_batch = [test_batch]
 
         self.image_width = 32
@@ -76,10 +75,12 @@ class CifarC:
         self.color_deapth = 255
         self.cs_rgb = 3
 
-        # Initialize some empty variables for later on
         self.training_images = None
         self.training_labels = None
         self.training_len = None
+        
+        self.training_images_shuffled = None
+        self.training_labels_shuffled = None
 
         self.test_images = None
         self.test_labels = None
@@ -101,6 +102,12 @@ class CifarC:
         self.training_labels = one_hot_encode(np.hstack([d[b"labels"] for d in self.all_train_batches]), num_labels)
 
         print_and_log("Setting Up Test Images and Labels")
+        
+        self.training_images_shuffled = self.training_images
+        self.training_labels_shuffled = self.training_labels
+        
+        random.Random(CM.SEED).shuffle(self.training_images_shuffled)
+        random.Random(CM.SEED).shuffle(self.training_labels_shuffled)
 
         # Vertically stacks the test images
         self.test_images = np.vstack([d[b"data"] for d in self.test_batch])
